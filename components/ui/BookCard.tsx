@@ -6,11 +6,14 @@ interface BookCardProps {
     genre: string
     coverBg: string
     large?: boolean
+    slug?: string
 }
 
-export default function BookCard({ title, author, genre, coverBg, large = false }: BookCardProps) {
+export default function BookCard({ title, author, genre, coverBg, large = false, slug }: BookCardProps) {
+    const href = slug ? `/books/${slug}` : '/books'
+
     return (
-        <Link href="/books" className="group block">
+        <Link href={href} className="group block">
             <div
                 className="relative overflow-hidden cursor-pointer border border-smoke hover:border-gold/60 transition-all duration-500 hover:scale-[1.02]"
                 style={{ aspectRatio: '2/3' }}
