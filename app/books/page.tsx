@@ -8,7 +8,7 @@ import BookCard from '@/components/ui/BookCard'
 /* ── Placeholder Data ── */
 
 const BOOKS = [
-  { id: 1, title: 'নীলিমার শেষ প্রান্তে', author: 'Arjun Dasgupta', genre: 'Literary Fiction', year: 2024, coverBg: '#1a1208', language: 'Bengali' },
+  { id: 1, title: 'নীলিমার শেষ প্রান্তে', author: 'Arjun Dasgupta', genre: 'Literary Fiction', year: 2024, coverBg: '#1a1208', language: 'Bengali', slug: 'nilimar-shesh-prante' },
   { id: 2, title: 'The Cartographer of Lost Skies', author: 'Priya Sengupta', genre: 'Science Fiction', year: 2024, coverBg: '#0d1219', language: 'English' },
   { id: 3, title: 'মাটির গান', author: 'Rabindra Chatterjee', genre: 'Poetry', year: 2023, coverBg: '#120d0d', language: 'Bengali' },
   { id: 4, title: 'Echoes in the Void', author: 'Meera Bose', genre: 'Fantasy', year: 2024, coverBg: '#0d120e', language: 'English' },
@@ -92,8 +92,8 @@ export default function BooksPage() {
                 key={genre}
                 onClick={() => setActiveGenre(genre)}
                 className={`font-cinzel text-xs tracking-widest px-4 py-2 border transition-all duration-300 cursor-pointer ${activeGenre === genre
-                    ? 'border-gold text-gold bg-gold/5'
-                    : 'border-smoke text-stone hover:border-gold/40 hover:text-parchment'
+                  ? 'border-gold text-gold bg-gold/5'
+                  : 'border-smoke text-stone hover:border-gold/40 hover:text-parchment'
                   }`}
               >
                 {genre}
