@@ -1,108 +1,46 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import SectionHeader from '@/components/ui/SectionHeader'
-
-/* ── Placeholder Data ── */
-const POSTS = [
-    {
-        id: 1,
-        slug: "why-independent-publishing-is-the-future",
-        title: "Why Independent Publishing is the Future of Bengali Literature",
-        category: "Essays",
-        date: "December 12, 2024",
-        readTime: "8 min read",
-        excerpt: "The mainstream gatekeepers have long ignored the rich diversity of voices emerging from Bengal. We believe that changes now — and here is why independent publishing is not just viable, but necessary.",
-        author: "Subhadeep Kar",
-        featured: true,
-        coverBg: "#1a1208",
-    },
-    {
-        id: 2,
-        slug: "in-conversation-with-priya-sengupta",
-        title: "In Conversation with Priya Sengupta",
-        category: "Author Interviews",
-        date: "November 28, 2024",
-        readTime: "12 min read",
-        excerpt: "We sat down with the author of The Cartographer of Lost Skies to talk about world-building, loneliness, and the act of writing science fiction in Bengali.",
-        author: "Poulami Mitra",
-        featured: false,
-        coverBg: "#0d1219",
-    },
-    {
-        id: 3,
-        slug: "the-art-of-the-book-cover",
-        title: "The Art of the Book Cover: How We Design for Emotion",
-        category: "News",
-        date: "November 5, 2024",
-        readTime: "6 min read",
-        excerpt: "A book cover is a promise. It tells the reader what kind of world they are about to enter. Here is how we approach every cover as a work of art in its own right.",
-        author: "Poulami Mitra",
-        featured: false,
-        coverBg: "#120d0d",
-    },
-    {
-        id: 4,
-        slug: "review-echoes-in-the-void",
-        title: "Review: Echoes in the Void by Meera Bose",
-        category: "Book Reviews",
-        date: "October 18, 2024",
-        readTime: "5 min read",
-        excerpt: "Meera Bose's debut fantasy novel is a rare thing — a book that builds an entire world and then dismantles it with the precision of a philosopher and the tenderness of a poet.",
-        author: "Subhadeep Kar",
-        featured: false,
-        coverBg: "#0d120e",
-    },
-    {
-        id: 5,
-        slug: "on-translating-silence",
-        title: "On Translating Silence: The Challenge of Bengali to English",
-        category: "Essays",
-        date: "September 30, 2024",
-        readTime: "10 min read",
-        excerpt: "Some things in Bengali simply do not translate. Not because English lacks the words, but because some feelings were born in a specific language and resist emigration.",
-        author: "Subhadeep Kar",
-        featured: false,
-        coverBg: "#1a1208",
-    },
-    {
-        id: 6,
-        slug: "announcing-2025-open-submissions",
-        title: "Announcing Our 2025 Open Submissions Window",
-        category: "News",
-        date: "September 1, 2024",
-        readTime: "3 min read",
-        excerpt: "We are opening our submissions window for 2025 acquisitions. We are particularly looking for debut novels, poetry collections, and science fiction this cycle.",
-        author: "Poulami Mitra",
-        featured: false,
-        coverBg: "#0d1219",
-    },
-    {
-        id: 7,
-        slug: "six-years-of-kothakhahon",
-        title: "Six Years of Kothakhahon: A Letter from the Founders",
-        category: "Essays",
-        date: "August 15, 2024",
-        readTime: "7 min read",
-        excerpt: "Six years ago we started with three books and a shared desk. Today we carry over 600 titles and the voices of 120 authors. Here is what we have learned.",
-        author: "Subhadeep Kar",
-        featured: false,
-        coverBg: "#120d0d",
-    },
-]
+import { getAllBlogPosts, urlFor } from '@/lib/sanity'
 
 const CATEGORIES = ["All", "Essays", "Author Interviews", "Book Reviews", "News"]
 
 export default function BlogIndexPage() {
+    const [posts, setPosts] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
     const [activeCategory, setActiveCategory] = useState("All")
 
-    const filteredPosts = activeCategory === 'All'
-        ? POSTS.filter(p => !p.featured)
-        : POSTS.filter(p => p.category === activeCategory)
+    useEffect(() => {
+        async function fetchPosts() {
+            try {
+                const data = await getAllBlogPosts()
+                setPosts(data)
+            } catch (error) {
+                console.error("Error fetching blog posts:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchPosts()
+    }, [])
 
-    const featuredPost = POSTS.find(p => p.featured)
+    const filteredPosts = activeCategory === 'All'
+        ? posts.filter(p => !p.featured)
+        : posts.filter(p => p.category === activeCategory)
+
+    const featuredPost = posts.find(p => p.featured)
+
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return "December 12, 2024"
+        return new Date(dateString).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        })
+    }
 
     return (
         <>
@@ -142,8 +80,8 @@ export default function BlogIndexPage() {
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 className={`font-cinzel text-xs tracking-widest px-4 py-2 border transition-all duration-300 uppercase ${activeCategory === cat
-                                        ? 'border-gold text-gold bg-gold/5'
-                                        : 'border-smoke text-stone hover:border-gold/40 hover:text-parchment'
+                                    ? 'border-gold text-gold bg-gold/5'
+                                    : 'border-smoke text-stone hover:border-gold/40 hover:text-parchment'
                                     }`}
                             >
                                 {cat}
@@ -152,7 +90,7 @@ export default function BlogIndexPage() {
                     </div>
 
                     <div className="font-mono text-xs text-stone tracking-widest uppercase flex-shrink-0">
-                        {activeCategory === 'All' ? POSTS.length : filteredPosts.length} Articles
+                        {!loading && `${activeCategory === 'All' ? posts.length : filteredPosts.length} Articles`}
                     </div>
 
                 </div>
@@ -161,43 +99,47 @@ export default function BlogIndexPage() {
             {/* ═══════════════════════════════════════════════
           SECTION 3 — Featured Post (Only on 'All')
       ═══════════════════════════════════════════════ */}
-            {activeCategory === 'All' && featuredPost && (
+            {activeCategory === 'All' && !loading && featuredPost && (
                 <section className="bg-void py-16 px-6">
                     <div className="max-w-7xl mx-auto">
                         <span className="font-mono text-xs text-gold tracking-widest mb-8 block uppercase">
                             FEATURED
                         </span>
 
-                        <Link href={`/blog/${featuredPost.slug}`} className="block group">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border border-smoke group-hover:border-gold/40 transition-all duration-500">
+                        <Link href={featuredPost.slug?.current ? `/blog/${featuredPost.slug.current}` : "/blog"} className="block group">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 glass-panel hover-glow-card hover:border-gold/40 transition-all duration-500 hover:-translate-y-2">
                                 {/* Left: Cover */}
                                 <div
-                                    className="aspect-[4/3] md:aspect-auto md:h-full min-h-[300px] relative p-4 flex"
-                                    style={{ backgroundColor: featuredPost.coverBg }}
+                                    className="aspect-[4/3] md:aspect-auto md:h-full min-h-[300px] relative p-4 flex overflow-hidden"
+                                    style={{ backgroundColor: '#1a1208' }}
                                 >
-                                    <span className="absolute top-4 left-4 font-mono text-xs text-gold bg-void/80 px-3 py-1 uppercase">
-                                        {featuredPost.category}
+                                    {featuredPost.coverImage && (
+                                        <img src={urlFor(featuredPost.coverImage).width(800).url()} alt={featuredPost.title} className="absolute inset-0 w-full h-full object-cover" />
+                                    )}
+                                    <span className="absolute top-4 left-4 font-mono text-xs text-gold bg-void/80 px-3 py-1 uppercase z-10">
+                                        {featuredPost.category || "Essays"}
                                     </span>
                                 </div>
 
                                 {/* Right: Content */}
-                                <div className="bg-obsidian p-10 md:p-16 flex flex-col justify-center">
+                                <div className="p-10 md:p-16 flex flex-col justify-center relative z-10">
                                     <span className="font-mono text-xs text-gold tracking-widest mb-4 uppercase">
-                                        {featuredPost.category}
+                                        {featuredPost.category || "Essays"}
                                     </span>
 
                                     <h2 className="font-cormorant text-4xl md:text-5xl text-ivory font-light leading-tight group-hover:text-gold transition-colors duration-300">
                                         {featuredPost.title}
                                     </h2>
 
-                                    <p className="font-garamond text-parchment text-lg leading-relaxed mt-6">
-                                        {featuredPost.excerpt}
-                                    </p>
+                                    {featuredPost.excerpt && (
+                                        <p className="font-garamond text-parchment text-lg leading-relaxed mt-6">
+                                            {featuredPost.excerpt}
+                                        </p>
+                                    )}
 
                                     <div className="mt-8 flex gap-6 items-center flex-wrap">
-                                        <span className="font-mono text-xs text-stone uppercase">{featuredPost.author}</span>
-                                        <span className="font-mono text-xs text-stone uppercase">{featuredPost.date}</span>
-                                        <span className="font-mono text-xs text-gold uppercase">{featuredPost.readTime}</span>
+                                        <span className="font-mono text-xs text-stone uppercase">{featuredPost.author?.name || 'Kothakhahon'}</span>
+                                        <span className="font-mono text-xs text-stone uppercase">{formatDate(featuredPost.publishedAt)}</span>
                                     </div>
 
                                     <span className="font-cinzel text-xs tracking-widest text-gold mt-8 inline-block border-b border-gold/40 pb-1 w-fit group-hover:text-ivory transition-colors duration-300 uppercase">
@@ -213,7 +155,7 @@ export default function BlogIndexPage() {
             {/* ═══════════════════════════════════════════════
           SECTION 4 — Regular Posts Grid
       ═══════════════════════════════════════════════ */}
-            <section className="bg-void pb-24 px-6 pt-16">
+            <section className="bg-void pb-24 px-6 pt-16 min-h-[50vh]">
                 <div className="max-w-7xl mx-auto">
                     {activeCategory !== 'All' && (
                         <div className="mb-12">
@@ -225,56 +167,67 @@ export default function BlogIndexPage() {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {filteredPosts.map((post, index) => (
-                            <Link href={`/blog/${post.slug}`} key={post.id} className="block group h-full">
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.08, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                    className="bg-obsidian border border-smoke hover:border-gold/40 transition-all duration-500 h-full flex flex-col"
-                                >
-                                    {/* Card Cover */}
-                                    <div className="h-48 relative" style={{ backgroundColor: post.coverBg }}>
-                                        <span className="absolute top-3 left-3 font-mono text-xs text-gold bg-void/80 px-2 py-1 uppercase">
-                                            {post.category}
-                                        </span>
-                                    </div>
-
-                                    {/* Card Content */}
-                                    <div className="p-8 flex flex-col flex-grow">
-                                        <span className="font-mono text-xs text-stone mb-4 uppercase">
-                                            {post.readTime}
-                                        </span>
-
-                                        <h3 className="font-cormorant text-2xl text-ivory leading-snug group-hover:text-gold transition-colors duration-300">
-                                            {post.title}
-                                        </h3>
-
-                                        <p className="font-garamond text-stone text-sm leading-relaxed mt-4 line-clamp-3">
-                                            {post.excerpt}
-                                        </p>
-
-                                        <div className="mt-auto pt-6 flex justify-between items-center">
-                                            <span className="font-mono text-xs text-stone uppercase">{post.author}</span>
-                                            <span className="font-mono text-xs text-stone uppercase">{post.date}</span>
-                                        </div>
-
-                                        <span className="font-cinzel text-xs tracking-widest text-gold mt-6 block border-b border-gold/30 pb-1 w-fit uppercase">
-                                            Read More →
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            </Link>
-                        ))}
-                    </div>
-
-                    {filteredPosts.length === 0 && (
-                        <div className="py-24 text-center">
-                            <p className="font-garamond italic text-stone text-xl">
-                                No articles found in this category.
-                            </p>
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="bg-obsidian border border-smoke animate-pulse h-64 w-full" />
+                            ))}
                         </div>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                {filteredPosts.map((post, index) => (
+                                    <Link href={post.slug?.current ? `/blog/${post.slug.current}` : "/blog"} key={post._id || index} className="block group h-full">
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.08, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                            className="glass-panel hover-glow-card hover:border-gold/40 transition-all duration-500 h-full flex flex-col overflow-hidden relative"
+                                        >
+                                            {/* Card Cover */}
+                                            <div className="h-48 relative overflow-hidden flex-shrink-0" style={{ backgroundColor: '#0d1219' }}>
+                                                {post.coverImage && (
+                                                    <img src={urlFor(post.coverImage).width(800).url()} alt={post.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                                )}
+                                                <span className="absolute top-3 left-3 font-mono text-xs text-gold bg-void/80 px-2 py-1 uppercase z-10">
+                                                    {post.category || "Essays"}
+                                                </span>
+                                            </div>
+
+                                            {/* Card Content */}
+                                            <div className="p-8 flex flex-col flex-grow relative z-10 transition-colors duration-500">
+                                                <h3 className="font-cormorant text-2xl text-ivory leading-snug group-hover:text-gold transition-colors duration-300">
+                                                    {post.title}
+                                                </h3>
+
+                                                {post.excerpt && (
+                                                    <p className="font-garamond text-stone text-sm leading-relaxed mt-4 line-clamp-3">
+                                                        {post.excerpt}
+                                                    </p>
+                                                )}
+
+                                                <div className="mt-auto pt-6 flex justify-between items-center">
+                                                    <span className="font-mono text-xs text-stone uppercase">{post.author?.name || 'Kothakhahon'}</span>
+                                                    <span className="font-mono text-xs text-stone uppercase">{formatDate(post.publishedAt)}</span>
+                                                </div>
+
+                                                <span className="font-cinzel text-xs tracking-widest text-gold mt-6 block border-b border-gold/30 pb-1 w-fit uppercase">
+                                                    Read More →
+                                                </span>
+                                            </div>
+                                        </motion.div>
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {filteredPosts.length === 0 && (
+                                <div className="py-24 text-center">
+                                    <p className="font-garamond italic text-stone text-xl">
+                                        No articles found in this category.
+                                    </p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </section>

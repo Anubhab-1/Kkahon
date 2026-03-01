@@ -58,7 +58,7 @@ export default function AboutPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 1.2, delay: 0.5 }}
                         >
-                            <h2 className="font-cormorant text-7xl md:text-9xl italic text-gold font-light leading-none md:ml-24">
+                            <h2 className="font-cormorant text-7xl md:text-9xl italic text-gold gold-shimmer font-light leading-none md:ml-24">
                                 গল্প
                             </h2>
                         </motion.div>
@@ -178,7 +178,7 @@ export default function AboutPage() {
                         ].map((genre, i) => (
                             <div
                                 key={i}
-                                className={`group reveal p-8 relative overflow-hidden bg-obsidian border border-smoke hover:border-gold/40 hover:bg-ash hover:shadow-gold/5 hover:shadow-lg transition-all duration-500 delay-${(i + 1) * 100}`}
+                                className={`group reveal p-8 relative overflow-hidden glass-panel hover-glow-card hover:border-gold/40 hover:-translate-y-2 transition-all duration-500 delay-${(i + 1) * 100}`}
                             >
                                 <div className="absolute top-4 right-4 font-mono text-6xl text-smoke/50 font-bold pointer-events-none transition-colors duration-500 group-hover:text-gold/10">
                                     {genre.number}
@@ -248,9 +248,9 @@ export default function AboutPage() {
                         ].map((member, i) => (
                             <div
                                 key={i}
-                                className={`bg-obsidian border border-smoke p-8 text-center reveal delay-${(i + 1) * 200}`}
+                                className={`glass-panel hover-glow-card p-8 text-center reveal hover:-translate-y-2 transition-transform duration-500 delay-${(i + 1) * 200}`}
                             >
-                                <div className="w-20 h-20 bg-ash border border-smoke mx-auto mb-6 flex items-center justify-center">
+                                <div className="w-20 h-20 bg-white/5 border border-white/10 mx-auto mb-6 flex items-center justify-center rounded-sm">
                                     <span className="font-cormorant text-3xl text-gold/50 font-light">
                                         {member.initials}
                                     </span>

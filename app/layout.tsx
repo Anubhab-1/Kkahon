@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import NavBar from "@/components/layout/NavBar";
 import Footer from "@/components/layout/Footer";
+import CustomCursor from "@/components/ui/CustomCursor";
+import ScrollToTop from "@/components/ui/ScrollToTop";
+import PageTransition from "@/components/ui/PageTransition";
 
 export const metadata: Metadata = {
   title: {
@@ -32,12 +35,24 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-void text-parchment font-garamond antialiased">
-        <NavBar />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+      <body className="bg-void text-parchment font-garamond antialiased relative">
+        {/* Animated Background Orbs */}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gold/5 blur-[120px] animate-float-1" />
+          <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-ember/5 blur-[150px] animate-float-2 opacity-60" />
+        </div>
+
+        <div className="relative z-10 flex min-h-screen flex-col">
+          <CustomCursor />
+          <NavBar />
+          <PageTransition>
+            <main className="min-h-screen">
+              {children}
+            </main>
+          </PageTransition>
+          <Footer />
+          <ScrollToTop />
+        </div>
       </body>
     </html>
   );

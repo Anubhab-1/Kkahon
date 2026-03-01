@@ -101,7 +101,7 @@ export default function ForAuthorsPage() {
                             </h2>
                         </motion.div>
                         <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, delay: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}>
-                            <h3 className="font-cormorant text-6xl md:text-8xl italic text-gold font-light leading-tight">
+                            <h3 className="font-cormorant text-6xl md:text-8xl italic text-gold gold-shimmer font-light leading-tight">
                                 to Be Heard.
                             </h3>
                         </motion.div>
@@ -113,13 +113,13 @@ export default function ForAuthorsPage() {
                         </p>
 
                         <div className="mt-12 flex flex-col sm:flex-row gap-8">
-                            <div className="border border-smoke px-6 py-4">
-                                <div className="font-cormorant text-3xl text-gold font-light">100%</div>
-                                <div className="font-mono text-xs text-stone tracking-widest mt-1 uppercase">Submissions Read</div>
+                            <div className="glass-panel hover-glow-card px-6 py-6 hover:-translate-y-2 transition-transform duration-500">
+                                <div className="font-cormorant text-4xl text-gold font-light">100%</div>
+                                <div className="font-mono text-[10px] text-stone tracking-widest mt-2 uppercase">Submissions Read</div>
                             </div>
-                            <div className="border border-smoke px-6 py-4">
-                                <div className="font-cormorant text-3xl text-gold font-light">4–6 Weeks</div>
-                                <div className="font-mono text-xs text-stone tracking-widest mt-1 uppercase">Average Response Time</div>
+                            <div className="glass-panel hover-glow-card px-6 py-6 hover:-translate-y-2 transition-transform duration-500">
+                                <div className="font-cormorant text-4xl text-gold font-light">4–6 Weeks</div>
+                                <div className="font-mono text-[10px] text-stone tracking-widest mt-2 uppercase">Average Response</div>
                             </div>
                         </div>
                     </motion.div>
@@ -247,12 +247,12 @@ export default function ForAuthorsPage() {
                             { number: "03", title: "Response", description: "We respond within 4–6 weeks with our decision." },
                             { number: "04", title: "Contract", description: "If selected, we move to editorial review and contract." },
                         ].map((step, i) => (
-                            <div key={i} className="flex flex-col items-center text-center md:flex-1 relative z-10 w-full md:w-auto">
-                                <div className="w-16 h-16 rounded-full border border-gold/40 flex items-center justify-center mb-4 bg-void">
-                                    <span className="font-mono text-xs text-gold tracking-widest">{step.number}</span>
+                            <div key={i} className="flex flex-col items-center text-center md:flex-1 relative z-10 w-full md:w-auto glass-panel p-8 hover:-translate-y-2 transition-transform duration-500 hover-glow-card">
+                                <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+                                    <span className="font-mono text-[10px] text-gold tracking-widest">{step.number}</span>
                                 </div>
-                                <h4 className="font-cinzel text-sm tracking-widest text-ivory mt-2 uppercase">{step.title}</h4>
-                                <p className="font-garamond text-stone text-sm mt-3 max-w-[160px] mx-auto">{step.description}</p>
+                                <h4 className="font-cinzel text-xs tracking-widest text-ivory mt-2 uppercase">{step.title}</h4>
+                                <p className="font-garamond text-stone text-xs mt-3 max-w-[160px] mx-auto leading-relaxed">{step.description}</p>
                             </div>
                         ))}
                     </div>

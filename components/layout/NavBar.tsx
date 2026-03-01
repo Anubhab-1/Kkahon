@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -15,6 +16,7 @@ const navLinks = [
 export default function NavBar() {
     const [scrolled, setScrolled] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
+    const pathname = usePathname()
 
     useEffect(() => {
         const handleScroll = () => {
@@ -34,13 +36,27 @@ export default function NavBar() {
             {/* Main bar */}
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 md:h-[72px]">
                 {/* Logo */}
-                <Link href="/" className="flex flex-col" onClick={closeMobile}>
-                    <span className="font-cinzel text-gold text-sm tracking-widest leading-tight">
-                        KOTHAKHAHON
-                    </span>
-                    <span className="font-cinzel text-stone text-xs tracking-widest leading-tight">
-                        PRAKASHANI
-                    </span>
+                <Link href="/" className="flex items-center gap-3 group" onClick={closeMobile}>
+                    <div className="relative">
+                        {/* Animated glow behind logo */}
+                        <div className="absolute inset-0 rounded-full bg-gold/20 blur-md
+                            opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-110
+                            transition-all duration-700 ease-out" />
+                        <img
+                            src="/images/logo.png"
+                            alt="Kothakhahon Prakashani"
+                            className="h-10 w-10 object-contain relative z-10
+                            transition-all duration-500 group-hover:scale-105"
+                        />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="font-cinzel text-gold text-xs tracking-widest leading-none">
+                            KOTHAKHAHON
+                        </span>
+                        <span className="font-cinzel text-stone text-[10px] tracking-widest leading-none mt-1">
+                            PRAKASHANI
+                        </span>
+                    </div>
                 </Link>
 
                 {/* Desktop nav links */}
@@ -49,7 +65,8 @@ export default function NavBar() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className="font-cinzel text-xs tracking-widest uppercase text-stone hover:text-ivory transition-colors duration-300"
+                            className={`font-cinzel text-xs tracking-widest uppercase transition-colors duration-300 ${pathname === link.href ? 'text-gold border-b border-gold pb-0.5' : 'text-stone hover:text-ivory'
+                                }`}
                         >
                             {link.label}
                         </Link>
@@ -92,7 +109,8 @@ export default function NavBar() {
                                 key={link.href}
                                 href={link.href}
                                 onClick={closeMobile}
-                                className="block font-cinzel text-xs tracking-widest text-stone hover:text-gold py-4 px-6 border-b border-smoke/50 transition-colors duration-300"
+                                className={`block font-cinzel text-xs tracking-widest uppercase transition-colors duration-300 py-4 px-6 border-b border-smoke/50 ${pathname === link.href ? 'text-gold' : 'text-stone hover:text-gold'
+                                    }`}
                             >
                                 {link.label}
                             </Link>

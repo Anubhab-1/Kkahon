@@ -24,11 +24,12 @@ export default function Footer() {
             <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
                 {/* Column 1 — Brand */}
                 <div>
-                    <div className="font-cinzel text-gold text-sm tracking-widest leading-tight">
-                        KOTHAKHAHON
-                    </div>
-                    <div className="font-cinzel text-stone text-xs tracking-widest mt-1">
-                        PRAKASHANI
+                    <div className="flex items-center gap-3 mb-4">
+                        <img src="/images/logo.png" alt="Kothakhahon Prakashani" className="h-12 w-12 object-contain" />
+                        <div>
+                            <div className="font-cinzel text-gold text-sm tracking-widest">KOTHAKHAHON</div>
+                            <div className="font-cinzel text-stone text-xs tracking-widest mt-1">PRAKASHANI</div>
+                        </div>
                     </div>
                     <p className="font-garamond italic text-stone text-sm mt-4">
                         Where stories find their voice.

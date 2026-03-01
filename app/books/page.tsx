@@ -1,56 +1,55 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search } from 'lucide-react'
 import BookCard from '@/components/ui/BookCard'
+import { getAllBooks, urlFor } from '@/lib/sanity'
 
-/* ── Placeholder Data ── */
-
-const BOOKS = [
-  { id: 1, title: 'নীলিমার শেষ প্রান্তে', author: 'Arjun Dasgupta', genre: 'Literary Fiction', year: 2024, coverBg: '#1a1208', language: 'Bengali', slug: 'nilimar-shesh-prante' },
-  { id: 2, title: 'The Cartographer of Lost Skies', author: 'Priya Sengupta', genre: 'Science Fiction', year: 2024, coverBg: '#0d1219', language: 'English' },
-  { id: 3, title: 'মাটির গান', author: 'Rabindra Chatterjee', genre: 'Poetry', year: 2023, coverBg: '#120d0d', language: 'Bengali' },
-  { id: 4, title: 'Echoes in the Void', author: 'Meera Bose', genre: 'Fantasy', year: 2024, coverBg: '#0d120e', language: 'English' },
-  { id: 5, title: 'শেষ চিঠি', author: 'Sourav Ghosh', genre: 'Literary Fiction', year: 2023, coverBg: '#1a1208', language: 'Bengali' },
-  { id: 6, title: 'The Silence Between Stars', author: 'Ananya Roy', genre: 'Science Fiction', year: 2023, coverBg: '#0d1219', language: 'English' },
-  { id: 7, title: 'আলোর ভেতর অন্ধকার', author: 'Indrani Mukherjee', genre: 'Poetry', year: 2024, coverBg: '#120d0d', language: 'Bengali' },
-  { id: 8, title: 'The Last Cartographer', author: 'Debashis Paul', genre: 'Fantasy', year: 2022, coverBg: '#0d120e', language: 'English' },
-  { id: 9, title: 'নদীর ওপারে', author: 'Susmita Dey', genre: 'Literary Fiction', year: 2022, coverBg: '#1a1208', language: 'Bengali' },
-  { id: 10, title: 'Quantum Dreamer', author: 'Ritesh Banerjee', genre: 'Science Fiction', year: 2024, coverBg: '#0d1219', language: 'English' },
-  { id: 11, title: 'শব্দের মাঝে', author: 'Puja Chakraborty', genre: 'Poetry', year: 2023, coverBg: '#120d0d', language: 'Bengali' },
-  { id: 12, title: 'The Iron Throne of Kalinga', author: 'Vikram Sen', genre: 'Fantasy', year: 2022, coverBg: '#0d120e', language: 'English' },
-  { id: 13, title: 'একা একা পথ', author: 'Moumita Das', genre: 'Literary Fiction', year: 2021, coverBg: '#1a1208', language: 'Bengali' },
-  { id: 14, title: 'Beyond the Event Horizon', author: 'Sanjay Mitra', genre: 'Science Fiction', year: 2023, coverBg: '#0d1219', language: 'English' },
-  { id: 15, title: 'রাতের কবিতা', author: 'Aparajita Sen', genre: 'Poetry', year: 2024, coverBg: '#120d0d', language: 'Bengali' },
-  { id: 16, title: 'The Dragon of Sundarbans', author: 'Krishanu Roy', genre: 'Fantasy', year: 2021, coverBg: '#0d120e', language: 'English' },
-  { id: 17, title: 'স্মৃতির শহর', author: 'Tanmoy Ghosh', genre: 'Literary Fiction', year: 2022, coverBg: '#1a1208', language: 'Bengali' },
-  { id: 18, title: 'Stellar Nomad', author: 'Diya Bose', genre: 'Science Fiction', year: 2021, coverBg: '#0d1219', language: 'English' },
-  { id: 19, title: 'আকাশের রঙ', author: 'Nilufar Islam', genre: 'Poetry', year: 2021, coverBg: '#120d0d', language: 'Bengali' },
-  { id: 20, title: 'The Witch of Hooghly', author: 'Priyanka Dutta', genre: 'Fantasy', year: 2024, coverBg: '#0d120e', language: 'English' },
-]
+// Client components cannot export revalidate, so freshness is handled by the fetch structure or API wrappers.
 
 const GENRES = ['All', 'Literary Fiction', 'Poetry', 'Science Fiction', 'Fantasy']
 const SORT_OPTIONS = ['Newest First', 'Oldest First', 'A → Z', 'Z → A']
 
-/* ── Page Component ── */
-
 export default function BooksPage() {
+  const [books, setBooks] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [activeGenre, setActiveGenre] = useState('All')
   const [sortBy, setSortBy] = useState('Newest First')
   const [searchQuery, setSearchQuery] = useState('')
 
-  const filteredBooks = BOOKS
-    .filter(book => activeGenre === 'All' || book.genre === activeGenre)
-    .filter(book =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+  useEffect(() => {
+    async function fetchBooks() {
+      try {
+        const data = await getAllBooks()
+        setBooks(data)
+      } catch (error) {
+        console.error("Error fetching books:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchBooks()
+  }, [])
+
+  const filteredBooks = books
+    .filter(book => activeGenre === 'All' || (book.genre && book.genre.includes(activeGenre)))
+    .filter(book => {
+      const q = searchQuery.toLowerCase()
+      const titleMatch = book.title?.toLowerCase().includes(q)
+      const authorMatch = book.author?.name?.toLowerCase().includes(q)
+      return titleMatch || authorMatch
+    })
     .sort((a, b) => {
-      if (sortBy === 'Newest First') return b.year - a.year
-      if (sortBy === 'Oldest First') return a.year - b.year
-      if (sortBy === 'A → Z') return a.title.localeCompare(b.title)
-      if (sortBy === 'Z → A') return b.title.localeCompare(a.title)
+      const yearA = a.publicationDate ? new Date(a.publicationDate).getFullYear() : 0
+      const yearB = b.publicationDate ? new Date(b.publicationDate).getFullYear() : 0
+      const titleA = a.title || ''
+      const titleB = b.title || ''
+
+      if (sortBy === 'Newest First') return yearB - yearA
+      if (sortBy === 'Oldest First') return yearA - yearB
+      if (sortBy === 'A → Z') return titleA.localeCompare(titleB)
+      if (sortBy === 'Z → A') return titleB.localeCompare(titleA)
       return 0
     })
 
@@ -76,7 +75,7 @@ export default function BooksPage() {
             Explore our complete catalog of literary fiction, poetry, science fiction, fantasy and more.
           </p>
           <p className="font-mono text-xs text-gold tracking-widest mt-6">
-            {filteredBooks.length} Title{filteredBooks.length !== 1 ? 's' : ''}
+            {!loading && `${filteredBooks.length} Title${filteredBooks.length !== 1 ? 's' : ''}`}
           </p>
         </div>
       </div>
@@ -135,10 +134,22 @@ export default function BooksPage() {
       </div>
 
       {/* ── Books Grid ── */}
-      <div className="bg-void py-16 px-6">
+      <div className="bg-void py-16 px-6 min-h-[50vh]">
         <div className="max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
-            {filteredBooks.length === 0 ? (
+            {loading ? (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              >
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="bg-obsidian border border-smoke animate-pulse aspect-[2/3] w-full" />
+                ))}
+              </motion.div>
+            ) : filteredBooks.length === 0 ? (
               <motion.div
                 key="empty"
                 initial={{ opacity: 0 }}
@@ -164,22 +175,30 @@ export default function BooksPage() {
                 key="grid"
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
               >
-                {filteredBooks.map((book, index) => (
-                  <motion.div
-                    key={book.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
-                  >
-                    <BookCard
-                      title={book.title}
-                      author={book.author}
-                      genre={book.genre}
-                      coverBg={book.coverBg}
-                      large={false}
-                    />
-                  </motion.div>
-                ))}
+                {filteredBooks.map((book, index) => {
+                  const authorName = book.author?.name || 'Unknown Author'
+                  const genreName = book.genre && book.genre.length > 0 ? book.genre[0] : 'Uncategorized'
+                  const imageUrl = book.coverImage ? urlFor(book.coverImage).width(400).url() : undefined
+                  const slug = book.slug?.current
+
+                  return (
+                    <motion.div
+                      key={book._id || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                    >
+                      <BookCard
+                        title={book.title}
+                        author={authorName}
+                        genre={genreName}
+                        imageUrl={imageUrl}
+                        slug={slug}
+                        large={false}
+                      />
+                    </motion.div>
+                  )
+                })}
               </motion.div>
             )}
           </AnimatePresence>
